@@ -64,3 +64,7 @@ Once the shield goes red, it stays red until your VPN reconnects and the IP matc
 ## Privacy
 
 Your IP is checked against [api.ipify.org](https://www.ipify.org/) — a minimal, open-source public IP lookup service. No other data is collected or sent anywhere. Everything else is stored locally in the browser.
+
+---
+
+> **Note:** This extension was fully vibecoded.
