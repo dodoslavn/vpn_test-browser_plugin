@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 56">
-  <path d="M24 4L8 10v14c0 9.4 6.8 18.1 16 20.9 9.2-2.8 16-11.5 16-20.9V10L24 4z" fill="#dc3545"/>
-  <path d="M27 17l-3 3-3-3-1.4 1.4 3 3-3 3L21 26l3-3 3 3 1.4-1.4-3-3 3-3L27 17z" fill="white"/>
-  <text x="24" y="54" text-anchor="middle" font-size="10" font-family="sans-serif" font-weight="bold" fill="#dc3545">VPN</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 52">
+  <g transform="scale(0.82) translate(5.5, 1)">
+    <path d="M24 4L8 10v14c0 9.4 6.8 18.1 16 20.9 9.2-2.8 16-11.5 16-20.9V10L24 4z" fill="#dc3545"/>
+    <path d="M27 17l-3 3-3-3-1.4 1.4 3 3-3 3L21 26l3-3 3 3 1.4-1.4-3-3 3-3L27 17z" fill="white"/>
+  </g>
+  <text x="24" y="51" text-anchor="middle" font-size="14" font-family="sans-serif" font-weight="bold" fill="#dc3545">VPN</text>
 </svg>
