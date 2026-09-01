@@ -2,6 +2,10 @@
 
 A browser extension that monitors your external IP and alerts you when your VPN connection drops.
 
+> **This project is completely vibe-coded** — written by an AI coding agent
+> from natural-language instructions, with human review and testing but no
+> hand-written code. Read it before you trust it with a production host.
+
 ## How it works
 
 - **Gray shield** — not connected to VPN, or VPN IP not configured yet
@@ -64,7 +68,3 @@ Once the shield goes red, it stays red until your VPN reconnects and the IP matc
 ## Privacy
 
 Your IP is checked against [api.ipify.org](https://www.ipify.org/) — a minimal, open-source public IP lookup service. No other data is collected or sent anywhere. Everything else is stored locally in the browser.
-
----
-
-> **Note:** This extension was fully vibecoded.
