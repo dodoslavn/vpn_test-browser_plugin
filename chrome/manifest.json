@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "VPN IP Watcher",
+  "version": "1.0.0",
+  "description": "Monitor your external IP and alert when your VPN drops",
+  "permissions": [
+    "notifications",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://api.ipify.org/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icons/icon-gray.svg"
+    },
+    "default_title": "VPN IP Watcher"
+  },
+  "icons": {
+    "48": "icons/icon-gray.svg",
+    "96": "icons/icon-gray.svg"
+  }
+}

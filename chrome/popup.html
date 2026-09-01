@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VPN IP Watcher</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div id="statusDot" class="dot dot-gray"></div>
+    <h1>VPN IP Watcher</h1>
+  </div>
+
+  <div class="section">
+    <label>Current IP</label>
+    <div class="ip-row">
+      <span id="currentIP" class="ip-value">—</span>
+      <button id="btnUseAsCurrent" class="btn-small" title="Set as VPN IP">Use as VPN IP</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <label>Your VPN IP</label>
+    <div class="ip-row">
+      <input id="vpnIP" type="text" placeholder="e.g. 185.220.101.1" spellcheck="false">
+      <button id="btnSave" class="btn-small btn-primary">Save</button>
+    </div>
+    <button id="btnClear" class="btn-link">Clear (disable watching)</button>
+  </div>
+
+  <div class="section">
+    <label>Check interval</label>
+    <select id="interval">
+      <option value="1">Every 1 minute</option>
+      <option value="5" selected>Every 5 minutes</option>
+      <option value="10">Every 10 minutes</option>
+      <option value="30">Every 30 minutes</option>
+    </select>
+  </div>
+
+  <div id="statusBar" class="status-bar status-neutral hidden">
+    <span id="statusText"></span>
+  </div>
+
+  <div class="footer">
+    <span id="lastCheck" class="muted">Never checked</span>
+    <button id="btnCheck" class="btn-check">Check now</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
