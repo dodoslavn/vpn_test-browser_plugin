@@ -15,7 +15,7 @@ async function render() {
     currentIP: null,
     vpnIP: null,
     status: 'unset',
-    intervalMinutes: 5,
+    intervalSeconds: 5,
     lastCheck: 0,
     lastError: null,
   });
@@ -25,7 +25,7 @@ async function render() {
 
   const sel = $('interval');
   for (const opt of sel.options) {
-    if (parseInt(opt.value) === data.intervalMinutes) opt.selected = true;
+    if (parseInt(opt.value) === data.intervalSeconds) opt.selected = true;
   }
 
   const dot = $('statusDot');
@@ -69,7 +69,6 @@ async function render() {
 
 async function saveVpnIP(ip) {
   const trimmed = ip.trim();
-  // Reset state when VPN IP changes
   await browser.storage.local.set({
     vpnIP: trimmed || null,
     wasOnVPN: false,
@@ -81,9 +80,8 @@ async function saveVpnIP(ip) {
 
 $('btnSave').addEventListener('click', async () => {
   await saveVpnIP($('vpnIP').value);
-  await browser.storage.local.set({ lastCheck: 0 });
   await browser.runtime.sendMessage({ type: 'checkNow' });
-  setTimeout(render, 1000);
+  setTimeout(render, 500);
 });
 
 $('btnUseAsCurrent').addEventListener('click', async () => {
@@ -91,9 +89,8 @@ $('btnUseAsCurrent').addEventListener('click', async () => {
   if (!currentIP) return;
   $('vpnIP').value = currentIP;
   await saveVpnIP(currentIP);
-  await browser.storage.local.set({ lastCheck: 0 });
   await browser.runtime.sendMessage({ type: 'checkNow' });
-  setTimeout(render, 1000);
+  setTimeout(render, 500);
 });
 
 $('btnClear').addEventListener('click', async () => {
@@ -105,21 +102,19 @@ $('btnClear').addEventListener('click', async () => {
 $('btnCheck').addEventListener('click', async () => {
   $('btnCheck').textContent = '...';
   $('btnCheck').disabled = true;
-  await browser.storage.local.set({ lastCheck: 0 });
   await browser.runtime.sendMessage({ type: 'checkNow' });
   setTimeout(async () => {
     await render();
     $('btnCheck').textContent = 'Check now';
     $('btnCheck').disabled = false;
-  }, 1500);
+  }, 1000);
 });
 
 $('interval').addEventListener('change', async (e) => {
-  await browser.storage.local.set({ intervalMinutes: parseInt(e.target.value) });
+  await browser.storage.local.set({ intervalSeconds: parseInt(e.target.value) });
+  await browser.runtime.sendMessage({ type: 'intervalChanged' });
 });
 
+// Refresh popup display every 5 seconds while open
 render();
-setInterval(async () => {
-  const { lastCheck } = await browser.storage.local.get({ lastCheck: 0 });
-  $('lastCheck').textContent = timeAgo(lastCheck);
-}, 10000);
+setInterval(render, 5000);

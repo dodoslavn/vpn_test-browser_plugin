@@ -1,5 +1,7 @@
 const IP_API = 'https://api.ipify.org?format=json';
 
+let pollInterval = null;
+
 async function checkIP() {
   let currentIP;
 
@@ -33,7 +35,6 @@ async function checkIP() {
     setIcon('green', '');
     await browser.storage.local.set({ status: 'on-vpn', wasOnVPN: true, vpnDropped: false });
   } else if (wasOnVPN) {
-    // VPN was up, now dropped — trigger alert
     setIcon('red', '!');
     await browser.storage.local.set({ status: 'vpn-dropped', wasOnVPN: false, vpnDropped: true });
     if (lastNotifiedIP !== currentIP) {
@@ -46,11 +47,9 @@ async function checkIP() {
       });
     }
   } else if (vpnDropped) {
-    // Still disconnected after a drop — keep red until VPN comes back
     setIcon('red', '!');
     await browser.storage.local.set({ status: 'vpn-dropped' });
   } else {
-    // Not on VPN, never was — just gray, no alarm
     setIcon('gray', '');
     await browser.storage.local.set({ status: 'not-on-vpn' });
   }
@@ -64,23 +63,21 @@ function setIcon(color, badge) {
   }
 }
 
-browser.alarms.create('poll', { periodInMinutes: 1 });
-
-browser.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name !== 'poll') return;
-  const { intervalMinutes, lastCheck } = await browser.storage.local.get({
-    intervalMinutes: 5,
-    lastCheck: 0,
-  });
-  const elapsed = (Date.now() - lastCheck) / 1000 / 60;
-  if (elapsed >= intervalMinutes) {
-    await checkIP();
-  }
-});
+async function startPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+  const { intervalSeconds } = await browser.storage.local.get({ intervalSeconds: 5 });
+  pollInterval = setInterval(checkIP, intervalSeconds * 1000);
+}
 
 browser.runtime.onMessage.addListener(async (msg) => {
   if (msg.type === 'checkNow') await checkIP();
+  if (msg.type === 'intervalChanged') await startPolling();
 });
 
-browser.runtime.onInstalled.addListener(() => checkIP());
-browser.runtime.onStartup.addListener(() => checkIP());
+browser.runtime.onInstalled.addListener(async () => {
+  await startPolling();
+  await checkIP();
+});
+
+startPolling();
+checkIP();

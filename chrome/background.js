@@ -1,5 +1,7 @@
 const IP_API = 'https://api.ipify.org?format=json';
 
+let pollInterval = null;
+
 async function checkIP() {
   let currentIP;
 
@@ -12,13 +14,12 @@ async function checkIP() {
     return;
   }
 
-  const result = await chrome.storage.local.get({
+  const { vpnIP, wasOnVPN, vpnDropped, lastNotifiedIP } = await chrome.storage.local.get({
     vpnIP: null,
     wasOnVPN: false,
     vpnDropped: false,
     lastNotifiedIP: null,
   });
-  const { vpnIP, wasOnVPN, vpnDropped, lastNotifiedIP } = result;
 
   await chrome.storage.local.set({ currentIP, lastCheck: Date.now(), lastError: null });
 
@@ -62,26 +63,35 @@ function setIcon(color, badge) {
   }
 }
 
-chrome.alarms.create('poll', { periodInMinutes: 1 });
+async function startPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+  const { intervalSeconds } = await chrome.storage.local.get({ intervalSeconds: 5 });
+  pollInterval = setInterval(checkIP, intervalSeconds * 1000);
+}
 
-chrome.alarms.onAlarm.addListener(async (alarm) => {
-  if (alarm.name !== 'poll') return;
-  const { intervalMinutes, lastCheck } = await chrome.storage.local.get({
-    intervalMinutes: 5,
-    lastCheck: 0,
-  });
-  const elapsed = (Date.now() - lastCheck) / 1000 / 60;
-  if (elapsed >= intervalMinutes) {
-    await checkIP();
-  }
+// Keepalive alarm — Chrome service workers sleep when idle.
+// This wakes the SW every 25 seconds and restarts the setInterval chain.
+chrome.alarms.create('keepalive', { periodInMinutes: 0.4 });
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'keepalive') startPolling();
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'checkNow') {
     checkIP().then(() => sendResponse({ done: true }));
-    return true; // keep channel open for async response
+    return true;
+  }
+  if (msg.type === 'intervalChanged') {
+    startPolling();
+    sendResponse({ done: true });
+    return true;
   }
 });
 
-chrome.runtime.onInstalled.addListener(() => checkIP());
-chrome.runtime.onStartup.addListener(() => checkIP());
+chrome.runtime.onInstalled.addListener(async () => {
+  await startPolling();
+  await checkIP();
+});
+
+startPolling();
+checkIP();
